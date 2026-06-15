@@ -114,7 +114,21 @@ The #1 cross-contract mistake is leaving `mint`/`burn` open so anyone can call i
 
 ## Implementation risks to watch
 
-1. **TTL / archival of persistent storage.** Sticker balances and Album slots live in *persistent* storage. Without `extend_ttl` on writes, entries archive after some ledgers and break silently later. Standardize a TTL-extend helper from the Sticker contract onward.
+1. **TTL / archival of persistent storage.** Sticker balances and Album slots live in *persistent* storage. Without `extend_ttl` on writes, entries archive after some ledgers and break silently later. Standardize a TTL-extend helper from the Sticker contract onward. **This is verified on testnet, not in unit tests** — the default test env does not simulate archival. See [implementation-plan.md](implementation-plan.md#hard-rule-2--ttl--archival-is-a-testnet-runtime-gate-not-a-unit-test) (Hard Rule 2).
 2. **Cross-contract authority wiring at bootstrap.** A wrong or forgotten `set_minter` only fails at runtime (in integration tests), not at compile time. The integration-test crate must cover every edge of the authority graph early.
 
 See [bootstrap-and-deploy.md](bootstrap-and-deploy.md) for the deploy ordering that makes the authority graph valid.
+
+## Where each contract is built
+
+Each contract maps to a build phase and ships on a class branch (full detail in [implementation-plan.md](implementation-plan.md)):
+
+| Contract | Phase | Ships on |
+|---|---|---|
+| Coin | 1 | `class-1-coin-faucet` |
+| Faucet | 2 | `class-1-coin-faucet` |
+| Sticker | 3 | `class-2-stickers` |
+| Pack | 4 | `class-3-packs-album` |
+| Store | 5 | `class-4-store-escrow` |
+| Album | 6 | `class-3-packs-album` |
+| Escrow | 7 | `class-4-store-escrow` |

@@ -2,6 +2,7 @@
 
 **Spectrum anchor:** total fungibility — every unit is identical; only a balance exists.
 **Contracts built:** `Coin` (OpenZeppelin `fungible` Base + Mintable) and `Faucet` (minter with a parametrizable cooldown, seeding 1000 Coin per student).
+**Branch:** `class-1-coin-faucet` · **Tag:** `v0.1-fungible` · **Implements:** Phases 0–2.
 
 ## Learning objectives
 
@@ -27,6 +28,11 @@ deploy Coin → deploy Faucet(coin_addr) → coin.set_minter(faucet_addr)
 ```
 
 ## Reproduce this ✅
+
+> On a clean checkout of `class-1-coin-faucet`:
+> ```bash
+> cargo test -p tests reproduce_class_1
+> ```
 
 1. Deploy Coin and Faucet and wire `set_minter`.
 2. Call the faucet and receive 1000 Coin.

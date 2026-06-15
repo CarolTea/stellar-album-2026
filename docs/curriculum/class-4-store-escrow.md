@@ -2,6 +2,7 @@
 
 **Spectrum anchor:** the trustless trade — atomic custody that ties all the pieces together with no intermediary.
 **Contracts built:** `Store` and `Escrow`.
+**Branch:** `class-4-store-escrow` · **Tag:** `v0.4-marketplace` · **Implements:** Phases 5 & 7.
 
 ## Learning objectives
 
@@ -41,6 +42,11 @@ deploy Escrow(sticker_addr)
 ```
 
 ## Reproduce this ✅
+
+> On a clean checkout of `class-4-store-escrow` (or `main`):
+> ```bash
+> cargo test -p tests reproduce_class_4
+> ```
 
 1. Buy a Pack by spending 100 Coin at the Store.
 2. Create an Escrow offer giving one of your stickers for a type another address holds; have that address accept.

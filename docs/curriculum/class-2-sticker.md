@@ -2,6 +2,7 @@
 
 **Spectrum anchor:** semi-fungibility — a *type* ("CEO") has interchangeable copies, but differs from another type ("CTO").
 **Contracts built:** `Sticker`, entirely hand-rolled.
+**Branch:** `class-2-stickers` · **Tag:** `v0.2-semifungible` · **Implements:** Phase 3.
 
 ## Learning objectives
 
@@ -34,6 +35,11 @@ Public surface: `balance_of(owner, type_id)`, `mint(to, type_id, amount)` (minte
 > This is the contract that has **no OpenZeppelin equivalent** — there is no ERC-1155 in `stellar-tokens` (see [decision D8](../decisions.md)). Building it from scratch is the point.
 
 ## Reproduce this ✅
+
+> On a clean checkout of `class-2-stickers`:
+> ```bash
+> cargo test -p tests reproduce_class_2
+> ```
 
 1. Mint 3 copies of the "CEO" type and 1 copy of a legendary type to yourself.
 2. Query the balances per id and confirm them.

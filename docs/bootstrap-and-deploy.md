@@ -83,3 +83,9 @@ This is the #1 place students hit `auth error` / `unreachable`. The integration-
 ## Smoke test per class
 
 Each class ends with a runnable "reproduce this" (see the [curriculum](curriculum/)). The bootstrap doc should list, per class, the minimal `stellar contract invoke` sequence that proves the day's contract works end-to-end — e.g. for Class 1: deploy Coin + Faucet, claim, observe balance, claim again before cooldown and see it fail.
+
+## TTL & archival — a testnet gate, not a unit test
+
+Sticker balances and Album slots live in **persistent** storage. The contracts call `extend_ttl` on every touch (helper + threshold consts in `contracts/test-utils`), but **the default Soroban test environment does not simulate archival/TTL expiry** — so a 100%-green `cargo test` does **not** prove archival safety.
+
+TTL correctness is therefore a **testnet/deploy-gate checklist item**, not a CI assertion: deploy to testnet, let a persistent entry approach expiry, and confirm the extend behavior keeps it alive. Don't read green CI as archival-safe. See [implementation-plan.md](implementation-plan.md#hard-rule-2--ttl--archival-is-a-testnet-runtime-gate-not-a-unit-test) (Hard Rule 2).

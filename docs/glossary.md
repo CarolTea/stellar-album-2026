@@ -31,3 +31,13 @@ Shared vocabulary for the course, so terms mean the same thing across all four c
 **Cooldown** — A minimum time between actions, enforced on-chain via `env.ledger().timestamp()`. The **Faucet** uses one to pace coin claims.
 
 **Cross-contract call** — One contract invoking a function on another. E.g. the Pack calls `Sticker.mint`. Requires the calling contract to hold the right authority.
+
+**Authority edge** — A cross-contract relationship where one contract is allowed to call a privileged function on another (e.g. Pack→Sticker mint). Each edge is enforced by a settable, admin-gated `Address` field and tested the moment both endpoints exist. See [implementation-plan.md](implementation-plan.md) Hard Rule 1.
+
+**Class branch** — A cumulative git branch holding the project state up to a given class (`class-1-coin-faucet` … `class-4-store-escrow`). A student checks one out to follow that class.
+
+**Definition of Done (DoD)** — The three-part bar a phase must clear: unit tests green, the class "reproduce this" runnable on a clean checkout, and /docs updated.
+
+**TTL gate** — The rule that persistent-storage archival safety is verified on testnet, not in unit tests (the test env doesn't simulate archival). See [implementation-plan.md](implementation-plan.md) Hard Rule 2.
+
+**test-utils** — The dev-only helper crate (`contracts/test-utils`) providing a shared test `setup()` and the `extend_ttl` convention used across contracts.

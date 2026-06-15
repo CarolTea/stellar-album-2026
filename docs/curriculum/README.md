@@ -15,7 +15,16 @@ A 4-class course. Each class anchors on one region of the [fungibility spectrum]
 ## Delivery (proposed)
 
 - One folder of material per class (objectives, step-by-step, the "reproduce this" checklist).
-- **One git branch per class** (`class-1`, `class-2`, …), each the accumulated state up to that point and compiling/running. `class-4` / `main` is the complete project. A student can check out any point and reproduce from scratch.
+- **One cumulative git branch per class**, each the accumulated state up to that point and compiling/running. `main` is the complete project. A student can check out any point and reproduce from scratch:
+
+  | Class | Branch | Tag | Ships |
+  |---|---|---|---|
+  | 1 | `class-1-coin-faucet` | `v0.1-fungible` | Coin + Faucet |
+  | 2 | `class-2-stickers` | `v0.2-semifungible` | + Sticker |
+  | 3 | `class-3-packs-album` | `v0.3-collectibles` | + Pack + Album |
+  | 4 | `class-4-store-escrow` | `v0.4-marketplace` | + Store + Escrow |
+
+  Build/ship order is intentionally non-linear (Store is built before Album but ships in Class 4); see [implementation-plan.md](../implementation-plan.md).
 - Supporting artifacts at the docs root: the [fungibility spectrum diagram](../fungibility-spectrum.md), the [bootstrap/deploy guide](../bootstrap-and-deploy.md), and the [glossary](../glossary.md), linked at the top of each class.
 
 ## Success criterion

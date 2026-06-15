@@ -2,6 +2,9 @@
 
 **Spectrum anchor:** the Pack is fungible *until opened*, when it collapses into unique items; the Album is the pure non-fungible, soulbound.
 **Contracts built:** `Pack` and `Album`.
+**Branch:** `class-3-packs-album` · **Tag:** `v0.3-collectibles` · **Implements:** Phases 4 & 6.
+
+> **Self-contained demo:** this class does **not** require the Store (Class 4). Pack has a direct-mint path so the reproduce-this runs as mint Pack → open → paste. See [decision D14](../decisions.md).
 
 ## Learning objectives
 
@@ -42,6 +45,11 @@ Because simulation reproduces the same PRNG result the real execution would use,
 This is acceptable precisely because it's a testnet demo for developers — the exploit is *the best lesson in the course*. See [decision D4](../decisions.md).
 
 ## Reproduce this ✅
+
+> On a clean checkout of `class-3-packs-album`:
+> ```bash
+> cargo test -p tests reproduce_class_3
+> ```
 
 1. Open a Pack; watch 3 stickers appear in Sticker and the Pack disappear.
 2. Paste a sticker into the Album; confirm it was burned and the slot marked.

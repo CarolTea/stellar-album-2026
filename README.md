@@ -36,6 +36,7 @@ This table is the spine of the whole course. See [`docs/fungibility-spectrum.md`
 | [`docs/bootstrap-and-deploy.md`](docs/bootstrap-and-deploy.md) | Workspace layout, build order, deploy sequence, and the cross-contract wiring. |
 | [`docs/glossary.md`](docs/glossary.md) | Shared vocabulary (fungible, semi-fungible, soulbound, burn, atomic, grindable…). |
 | [`docs/decisions.md`](docs/decisions.md) | Decision log — what was decided and why (ADR-style). |
+| [`docs/implementation-plan.md`](docs/implementation-plan.md) | Phased build plan, test gates, branch/tag scheme, and live status. |
 | [`docs/curriculum/`](docs/curriculum/) | The 4-class syllabus, one file per class. |
 
 ---
@@ -72,4 +73,4 @@ Then follow [`docs/bootstrap-and-deploy.md`](docs/bootstrap-and-deploy.md) and t
 
 ## Status
 
-Design complete; implementation not yet started. Open questions tracked at the bottom of [`docs/decisions.md`](docs/decisions.md).
+**Phase 0 — scaffolding.** See [`docs/implementation-plan.md`](docs/implementation-plan.md) for the live phase status and test gates; open questions are tracked at the bottom of [`docs/decisions.md`](docs/decisions.md).
