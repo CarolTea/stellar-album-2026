@@ -13,7 +13,7 @@ That single path demonstrates the whole [fungibility spectrum](fungibility-spect
 - **Vite + React + TypeScript + Tailwind** — client-only; all reads/writes against Soroban RPC.
 - **Generated bindings** — `stellar contract bindings typescript` per deployed contract → a typed client (`pack.open` → `AssembledTransaction<Array<u32>>`). No hand-written XDR.
 - **`@stellar/stellar-sdk`** — the engine under the bindings (simulate / sign / send / poll).
-- **Wallet** — Freighter via `@creit.tech/stellar-wallets-kit`.
+- **Wallet** — `@creit.tech/stellar-wallets-kit` with all no-config browser wallets enabled (`allowAllModules()`: Freighter, xBull, Lobstr, Albedo, Rabet, Hana, …). The selected wallet id is persisted to `localStorage` and silently restored on load, so a page refresh keeps the session (no keys are stored).
 
 ## Testnet deployment (`bootstrap.sh` → `make bootstrap`)
 
@@ -51,7 +51,7 @@ Out of scope for a test session — testnet persistent entries get a generous de
 3. **Buy** — `store.buy_pack` (spend 100 Coin).
 4. **Open + reveal** — `pack.open` returns the 3 drawn types in the tx result; reveal rarity + type. **The reveal is the payoff** — fire the tx and start the rip animation together, hold cards face-down during confirmation (~5s testnet ledger), flip on success. No spinner. *Correct first (3 stickers, right rarity, from chain), choreography second.*
 
-**v2:** Album view + paste, Escrow trade (invite-link flow). Both contracts already exist on `main`.
+**v2 (built):** Album view + paste, and a visual **Escrow marketplace** — every open offer is listed with give↔want sticker faces and a one-click accept (no offer-number typing). This relies on escrow read methods added after the original design: `offers() -> Vec<OfferView>` and `get_offer(id)` (see [architecture.md](architecture.md#escrow)).
 
 ## The reveal data path (confirmed)
 

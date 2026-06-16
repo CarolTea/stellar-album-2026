@@ -7,7 +7,7 @@ A 4-class course. Each class anchors on one region of the [fungibility spectrum]
 
 | Class | Title | Spectrum anchor | Contracts |
 |---|---|---|---|
-| [1](class-1-coin-faucet.md) | Coin — the pure fungible | Fungible (pure) | Coin, Faucet |
+| [1](class-1-coin-faucet.md) | Architecture, then Coin — the system & the pure fungible | Whole spectrum → Fungible (pure) | Coin, Faucet |
 | [2](class-2-sticker.md) | Sticker — semi-fungible, by hand | Semi-fungible | Sticker |
 | [3](class-3-pack-album.md) | Pack + Album — the collapse & the soulbound | Fungible→unique; non-fungible | Pack, Album |
 | [4](class-4-store-escrow.md) | Store + Escrow — the economy & the trustless trade | The trade | Store, Escrow |
