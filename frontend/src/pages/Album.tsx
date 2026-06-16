@@ -4,12 +4,11 @@ import { useStore } from "../store";
 import { Page, SectionHead, ProgressMeter, Toast } from "../components/ui";
 import { Sticker } from "../components/Sticker";
 import { Confetti } from "../components/Confetti";
-import { stickerImage } from "../lib/stickers";
+import { stickerImage, stickerName } from "../lib/stickers";
 import {
   ALBUM_PAGES,
   pageOfType,
   pageTypes,
-  stickerName,
   tier,
   TIER_FACE,
   TIER_GLYPH,

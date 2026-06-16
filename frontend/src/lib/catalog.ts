@@ -30,10 +30,29 @@ export const TIER_GLYPH: Record<Tier, string> = {
   Legendary: "✦",
 };
 
-// Placeholder identities until real SDF art/metadata (decision D15).
-export function stickerName(typeId: number): string {
-  return `SDF #${typeId}`;
-}
+// Who / what is on each image, by image index (frontend/images/00..17).
+// In the order provided; verify against the per-image descriptions.
+// (The 19th list entry, "Stellar Village", has no image.)
+export const NAMES = [
+  "Nicole Adair",
+  "Daniela Henao",
+  "Jose Fernandez da Ponte",
+  "Laura Martínez",
+  "Wlad Mendes",
+  "Pedro Pelicioni",
+  "Give Colombia 2026",
+  "Tyler van der Hoeven",
+  "Caio Matos",
+  "Shaun Jhonson",
+  "Bri Wylde",
+  "Elliot Voris",
+  "De-Ann Abraham",
+  "Teague Kaylor",
+  "Kaan Kacar",
+  "Danelle Dixon",
+  "Bastian Koh",
+  "Meridian 2026",
+];
 
 // Album leaves: each page is built around a hero (its rarest sticker) plus a
 // supporting cast. Two legendary-hero pages, then two rare-hero pages.
