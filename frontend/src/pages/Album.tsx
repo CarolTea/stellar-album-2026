@@ -157,14 +157,17 @@ function SmallSlot({ typeId, filled }: { typeId: number; filled: boolean }) {
   if (filled) {
     return (
       <motion.div initial={{ scale: 1.18, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={SETTLE} className={`relative aspect-[3/4] overflow-hidden rounded-xl shadow-sm ${TIER_FACE[tier(typeId)]}`}>
-        <img src={stickerImage(typeId)} alt={stickerName(typeId)} className="h-full w-full object-cover" />
+        <img src={stickerImage(typeId)} alt={stickerName(typeId)} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ink/90 to-transparent px-1.5 pb-1 pt-5">
+          <div className="line-clamp-2 font-display text-[10px] font-bold leading-tight text-paper">{stickerName(typeId)}</div>
+        </div>
       </motion.div>
     );
   }
   return (
-    <div className="relative flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl border border-dashed border-edge">
+    <div className="relative flex aspect-[3/4] items-end justify-center overflow-hidden rounded-xl border border-dashed border-edge">
       <img src={stickerImage(typeId)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-10 grayscale" />
-      <span className="relative text-xs text-ink-soft/50">#{typeId}</span>
+      <span className="relative z-10 mb-1 line-clamp-2 px-1 text-center font-display text-[10px] font-semibold leading-tight text-ink-soft">{stickerName(typeId)}</span>
     </div>
   );
 }
