@@ -1,25 +1,23 @@
-import { tier, TIER_FACE, TIER_GLYPH, TIER_LABEL } from "../lib/catalog";
+import { tier, TIER_FACE, TIER_GLYPH } from "../lib/catalog";
 import { stickerImage, stickerName } from "../lib/stickers";
 
-// The collectible itself: an identifiable object with a name + rarity.
-// `qty` shows stacked duplicates; legendary carries a holographic sheen.
+// The collectible: the photo fills the card, with the name + rarity over a
+// legibility scrim. The tier ring frames it; legendary keeps its foil sheen.
+// `qty` shows stacked duplicates.
 export function Sticker({ typeId, qty, big }: { typeId: number; qty?: number; big?: boolean }) {
   const t = tier(typeId);
   return (
-    <div className={`relative flex aspect-[3/4] flex-col items-center justify-center rounded-2xl px-2 ${TIER_FACE[t]}`}>
+    <div className={`relative aspect-[3/4] overflow-hidden rounded-2xl ${TIER_FACE[t]}`}>
+      <img src={stickerImage(typeId)} alt={stickerName(typeId)} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
       {qty != null && qty > 1 && (
-        <span className="absolute right-1.5 top-1.5 z-10 rounded-full bg-ink px-1.5 py-0.5 text-[10px] font-bold text-paper">×{qty}</span>
+        <span className="absolute right-1.5 top-1.5 z-20 rounded-full bg-ink px-1.5 py-0.5 text-[10px] font-bold text-paper">×{qty}</span>
       )}
-      <img
-        src={stickerImage(typeId)}
-        alt={stickerName(typeId)}
-        loading="lazy"
-        className={`relative z-10 rounded-full object-cover ring-2 ring-paper shadow-sm ${big ? "h-24 w-24" : "h-14 w-14"}`}
-      />
-      <div className={`relative z-10 mt-1 line-clamp-2 px-1 text-center font-display font-bold leading-tight text-ink ${big ? "text-base" : "text-xs"}`}>{stickerName(typeId)}</div>
-      <div className={`relative z-10 mt-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide ${TIER_LABEL[t]}`}>
-        <span aria-hidden>{TIER_GLYPH[t]}</span>
-        {t}
+      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ink/90 via-ink/45 to-transparent px-2 pb-2 pt-7">
+        <div className={`line-clamp-2 font-display font-bold leading-tight text-paper ${big ? "text-base" : "text-xs"}`}>{stickerName(typeId)}</div>
+        <div className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-paper/80">
+          <span aria-hidden>{TIER_GLYPH[t]}</span>
+          {t}
+        </div>
       </div>
     </div>
   );

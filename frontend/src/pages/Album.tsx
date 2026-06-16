@@ -134,19 +134,21 @@ function HeroSlot({ typeId, filled }: { typeId: number; filled: boolean }) {
   const t = tier(typeId);
   if (filled) {
     return (
-      <motion.div initial={{ scale: 1.22, rotate: -4, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={SETTLE} className={`relative flex aspect-[4/5] flex-col items-center justify-center rounded-3xl shadow-lg ${TIER_FACE[t]}`}>
-        <img src={stickerImage(typeId)} alt={stickerName(typeId)} className="relative z-10 h-28 w-28 rounded-full object-cover ring-4 ring-paper shadow-md sm:h-32 sm:w-32" />
-        <div className="relative z-10 mt-2 font-display text-xl font-extrabold text-ink">{stickerName(typeId)}</div>
-        <div className="relative z-10 mt-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-ink-soft"><span aria-hidden>{TIER_GLYPH[t]}</span>{t}</div>
+      <motion.div initial={{ scale: 1.22, rotate: -4, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={SETTLE} className={`relative aspect-[4/5] overflow-hidden rounded-3xl shadow-lg ${TIER_FACE[t]}`}>
+        <img src={stickerImage(typeId)} alt={stickerName(typeId)} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-ink/90 via-ink/45 to-transparent px-4 pb-4 pt-12">
+          <div className="line-clamp-2 font-display text-xl font-extrabold leading-tight text-paper">{stickerName(typeId)}</div>
+          <div className="mt-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-paper/80"><span aria-hidden>{TIER_GLYPH[t]}</span>{t}</div>
+        </div>
       </motion.div>
     );
   }
   return (
-    <div className="flex aspect-[4/5] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-edge bg-cream shadow-[inset_0_3px_12px_oklch(0.5_0.02_150/0.12)]">
-      <img src={stickerImage(typeId)} alt="" className="h-24 w-24 rounded-full object-cover opacity-20 grayscale" />
-      <div className="mt-3 flex items-center gap-1.5 font-display text-sm font-bold uppercase tracking-widest text-ink-soft"><span aria-hidden>{TIER_GLYPH[t]}</span>{t}</div>
-      <div className="font-display text-2xl font-extrabold text-ink-soft/50">#{typeId}</div>
-      <div className="mt-1 text-xs text-ink-soft">Star of this page</div>
+    <div className="relative flex aspect-[4/5] flex-col items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-edge bg-cream">
+      <img src={stickerImage(typeId)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-15 grayscale" />
+      <div className="relative z-10 flex items-center gap-1.5 font-display text-sm font-bold uppercase tracking-widest text-ink-soft"><span aria-hidden>{TIER_GLYPH[t]}</span>{t}</div>
+      <div className="relative z-10 line-clamp-1 px-3 text-center font-display text-base font-extrabold text-ink-soft/70">{stickerName(typeId)}</div>
+      <div className="relative z-10 mt-1 text-xs text-ink-soft">Star of this page</div>
     </div>
   );
 }
