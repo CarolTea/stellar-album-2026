@@ -106,6 +106,7 @@ function PickerModal({
   title,
   items,
   collection,
+  pasted,
   owned,
   onPick,
   onClose,
@@ -113,6 +114,7 @@ function PickerModal({
   title: string;
   items: number[];
   collection: number[];
+  pasted: boolean[];
   owned: boolean;
   onPick: (t: number) => void;
   onClose: () => void;
@@ -149,7 +151,10 @@ function PickerModal({
         ) : (
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
             {items.map((t) => {
-              const has = (collection[t] ?? 0) > 0;
+              // "Have it" means it's in your drawer OR already pasted in your
+              // album — a pasted sticker is burned from the collection, so it
+              // must still count as owned here, not "missing".
+              const has = (collection[t] ?? 0) > 0 || !!pasted[t];
               return (
                 <motion.button
                   key={t}
@@ -175,7 +180,7 @@ function PickerModal({
 }
 
 export default function Trade() {
-  const { address, collection, offers, busy, error, createOffer, acceptOffer, cancelOffer, reloadOffers } = useStore();
+  const { address, collection, pasted, offers, busy, error, createOffer, acceptOffer, cancelOffer, reloadOffers } = useStore();
   const owned = TYPES.filter((t) => (collection[t] ?? 0) > 0);
 
   const [give, setGive] = useState<number | undefined>();
@@ -329,6 +334,7 @@ export default function Trade() {
             title="Choose what you'll give"
             items={giveItems}
             collection={collection}
+            pasted={pasted}
             owned
             onPick={onPick}
             onClose={() => setPicking(null)}
@@ -339,6 +345,7 @@ export default function Trade() {
             title="Choose what you want"
             items={wantItems}
             collection={collection}
+            pasted={pasted}
             owned={false}
             onPick={onPick}
             onClose={() => setPicking(null)}
