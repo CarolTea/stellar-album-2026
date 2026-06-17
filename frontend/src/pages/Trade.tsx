@@ -234,6 +234,14 @@ export default function Trade() {
   const giveItems = owned.filter((t) => t !== want);
   const wantItems = TYPES.filter((t) => t !== give);
 
+  const mine = useMemo(() => offers.filter((o) => o.maker === address), [offers, address]);
+  const others = useMemo(() => {
+    const canAccept = (o: Offer) => (collection[o.want] ?? 0) > 0;
+    return offers
+      .filter((o) => o.maker !== address)
+      .sort((a, b) => Number(canAccept(b)) - Number(canAccept(a)));
+  }, [offers, collection, address]);
+
   return (
     <Page>
       <SectionHead
@@ -302,20 +310,20 @@ export default function Trade() {
           </button>
         </div>
         <p className="mt-1 max-w-prose text-sm text-ink-soft">
-          Every swap on the table right now. Accepting is atomic — both stickers move together, or nothing does.
+          Swaps posted by other collectors. Accepting is atomic — both stickers move together, or nothing does.
         </p>
 
-        {offers.length === 0 ? (
+        {others.length === 0 ? (
           <p className="mt-5 rounded-xl bg-paper px-4 py-8 text-center text-sm text-ink-soft ring-1 ring-edge">
-            No open offers yet. Put one on the table above, or check back later.
+            No offers from other collectors right now. Check back later.
           </p>
         ) : (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {offers.map((o) => (
+            {others.map((o) => (
               <OfferCard
                 key={o.id}
                 offer={o}
-                mine={o.maker === address}
+                mine={false}
                 canAccept={(collection[o.want] ?? 0) > 0}
                 busy={!!busy}
                 onAccept={() => acceptOffer(o.id)}
