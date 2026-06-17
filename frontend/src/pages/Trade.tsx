@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useStore, type Offer } from "../store";
 import { Page, SectionHead, Toast } from "../components/ui";
@@ -12,9 +12,9 @@ const short = (a: string) => `${a.slice(0, 4)}…${a.slice(-4)}`;
 
 // A small "give ⇄ want" pair of sticker cards, reused in the confirmation and
 // in every marketplace row.
-function SwapPair({ give, want, size = "w-20" }: { give: number; want: number; size?: string }) {
+function SwapPair({ give, want, size = "w-20", center = false }: { give: number; want: number; size?: string; center?: boolean }) {
   return (
-    <div className="flex items-center gap-2.5">
+    <div className={`flex items-center gap-2.5 ${center ? "justify-center" : ""}`}>
       <div className={size}><Sticker typeId={give} /></div>
       <span aria-hidden className="text-lg text-ink-soft">⇄</span>
       <div className={size}><Sticker typeId={want} /></div>
@@ -40,8 +40,8 @@ function OfferCard({
   onCancel: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl bg-paper p-4 ring-1 ring-edge">
-      <SwapPair give={offer.give} want={offer.want} />
+    <div className="flex h-full flex-col gap-3 rounded-2xl bg-paper p-4 ring-1 ring-edge">
+      <SwapPair give={offer.give} want={offer.want} center={mine} />
       <div className="text-xs text-ink-soft">
         <span className="font-semibold text-ink">{stickerName(offer.give)}</span> for{" "}
         <span className="font-semibold text-ink">{stickerName(offer.want)}</span>
@@ -52,12 +52,12 @@ function OfferCard({
         <button
           onClick={onCancel}
           disabled={busy}
-          className="rounded-full px-4 py-2 text-sm font-bold text-leaf-deep underline-offset-2 transition hover:underline disabled:opacity-40"
+          className="mt-auto rounded-full px-4 py-2 text-sm font-bold text-leaf-deep underline-offset-2 transition hover:underline disabled:opacity-40"
         >
           Take it back
         </button>
       ) : (
-        <div className="flex flex-col gap-1">
+        <div className="mt-auto flex flex-col gap-1">
           <button
             onClick={onAccept}
             disabled={busy || !canAccept}
@@ -71,6 +71,58 @@ function OfferCard({
             </span>
           )}
         </div>
+      )}
+    </div>
+  );
+}
+
+function Carousel({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(true);
+  const [overflow, setOverflow] = useState(false);
+
+  const sync = () => {
+    const el = ref.current;
+    if (!el) return;
+    setAtStart(el.scrollLeft <= 1);
+    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 1);
+    setOverflow(el.scrollWidth > el.clientWidth + 1);
+  };
+
+  useEffect(() => { sync(); });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const page = (dir: -1 | 1) =>
+    ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.8, behavior: "smooth" });
+
+  const arrow =
+    "absolute top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-paper text-xl font-bold text-ink shadow-md ring-1 ring-edge transition hover:bg-cream focus-visible:outline-2 focus-visible:outline-leaf disabled:pointer-events-none disabled:opacity-0";
+
+  return (
+    <div className="relative">
+      {overflow && (
+        <button aria-label="Scroll left" onClick={() => page(-1)} disabled={atStart} className={`${arrow} -left-2`}>
+          ‹
+        </button>
+      )}
+      <div
+        ref={ref}
+        onScroll={sync}
+        className="flex gap-3 overflow-x-auto scroll-smooth p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {children}
+      </div>
+      {overflow && (
+        <button aria-label="Scroll right" onClick={() => page(1)} disabled={atEnd} className={`${arrow} -right-2`}>
+          ›
+        </button>
       )}
     </div>
   );
@@ -286,8 +338,8 @@ export default function Trade() {
               <SwapPair give={created.give} want={created.want} />
             </div>
             <p className="mt-3 text-xs text-leaf-deep">
-              Your {stickerName(created.give)} is held in escrow until someone trades their {stickerName(created.want)} for it — it now shows in
-              the offers below, or you can{" "}
+              Your {stickerName(created.give)} is held in escrow until someone trades their {stickerName(created.want)} for it — it now shows
+              under Your offers below, or you can{" "}
               <button onClick={() => onCancel(created.id)} disabled={!!busy} className="font-bold underline disabled:opacity-50">
                 take it back
               </button>
@@ -296,6 +348,32 @@ export default function Trade() {
           </div>
         )}
       </div>
+
+      {/* Your offers ------------------------------------------------------ */}
+      {mine.length > 0 && (
+        <div className="mt-6 rounded-2xl bg-cream p-6 ring-1 ring-edge">
+          <h3 className="font-display text-lg font-bold text-ink">Your offers</h3>
+          <p className="mt-1 max-w-prose text-sm text-ink-soft">
+            Swaps you've put on the table. Each sticker sits in escrow until someone fills it — or you take it back.
+          </p>
+          <div className="mt-4">
+            <Carousel>
+              {mine.map((o) => (
+                <div key={o.id} className="w-64 shrink-0 snap-start">
+                  <OfferCard
+                    offer={o}
+                    mine
+                    canAccept={false}
+                    busy={!!busy}
+                    onAccept={() => {}}
+                    onCancel={() => onCancel(o.id)}
+                  />
+                </div>
+              ))}
+            </Carousel>
+          </div>
+        </div>
+      )}
 
       {/* Open offers (marketplace) ---------------------------------------- */}
       <div className="mt-6 rounded-2xl bg-cream p-6 ring-1 ring-edge">
