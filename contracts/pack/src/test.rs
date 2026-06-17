@@ -1,5 +1,6 @@
+extern crate std;
 use crate::{Pack, PackClient};
-use soroban_sdk::{testutils::Address as _, Address, Env};
+use soroban_sdk::{testutils::Address as _, Address, Env, String};
 use sticker::{Sticker, StickerClient};
 
 /// Deploy Sticker + Pack and wire Pack as Sticker's minter (the Pack→Sticker edge).
@@ -19,6 +20,61 @@ fn total_stickers(sticker: &StickerClient, owner: &Address) -> i128 {
     (0..common::TYPE_COUNT)
         .map(|t| sticker.balance(owner, &t))
         .sum()
+}
+
+/// Open `n` packs for `who` and collect the flattened sequence of drawn types.
+fn drawn_sequence(pack: &PackClient, who: &Address, n: u32) -> std::vec::Vec<u32> {
+    let mut seq = std::vec::Vec::new();
+    for _ in 0..n {
+        for t in pack.open(who).iter() {
+            seq.push(t);
+        }
+    }
+    seq
+}
+
+/// The draw must be personalized to the opener: two different players must NOT
+/// share the identical draw sequence. Before the per-opener seed fix the seed
+/// was `sha256(nonce)` only, so everyone's n-th pack drew the same types and
+/// this would fail. See docs/decisions.md D22.
+#[test]
+fn different_openers_draw_different_sequences() {
+    let e = test_utils::setup();
+    let (_sticker, pack, _admin) = setup(&e);
+    let alice = Address::generate(&e);
+    let bob = Address::generate(&e);
+    pack.mint(&alice, &20);
+    pack.mint(&bob, &20);
+
+    assert_ne!(
+        drawn_sequence(&pack, &alice, 20),
+        drawn_sequence(&pack, &bob, 20),
+        "different openers must not share the identical draw sequence"
+    );
+}
+
+/// The draw must stay deterministic per `(opener, nonce)` so the simulated and
+/// executed footprints match (a hard Soroban requirement). The same opener in
+/// two fresh environments must reproduce the same sequence — i.e. the seed is a
+/// pure function of opener+nonce, with no real entropy. Guards the fix.
+#[test]
+fn draws_are_deterministic_per_opener() {
+    fn seq_for() -> std::vec::Vec<u32> {
+        let e = test_utils::setup();
+        let (_sticker, pack, _admin) = setup(&e);
+        let who = Address::from_string(&String::from_str(
+            &e,
+            "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",
+        ));
+        pack.mint(&who, &10);
+        drawn_sequence(&pack, &who, 10)
+    }
+
+    assert_eq!(
+        seq_for(),
+        seq_for(),
+        "the same opener must reproduce the same draw sequence"
+    );
 }
 
 #[test]
