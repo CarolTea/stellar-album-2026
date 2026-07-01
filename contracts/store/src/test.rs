@@ -58,12 +58,14 @@ fn buy_pack_debits_coin_and_mints_a_pack() {
 }
 
 #[test]
-#[should_panic]
+#[should_panic(expected = "not enough coins")]
 fn buy_without_enough_coin_traps() {
     let e = test_utils::setup();
     let w = setup(&e);
     let buyer = Address::generate(&e);
     w.coin.mint(&buyer, &50); // not enough for a 100 pack
 
+    // The Store's explicit pre-check (#14) traps with a clear message before the
+    // Coin token's opaque internal-balance panic can fire.
     w.store.buy_pack(&buyer);
 }

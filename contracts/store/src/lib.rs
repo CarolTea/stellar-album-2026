@@ -13,6 +13,7 @@ use soroban_sdk::{
 /// Coin payment interface (declared locally to avoid the cdylib dependency).
 #[contractclient(name = "CoinPay")]
 pub trait CoinInterface {
+    fn balance(env: Env, account: Address) -> i128;
     fn transfer(env: Env, from: Address, to: MuxedAddress, amount: i128);
 }
 
@@ -64,8 +65,17 @@ impl Store {
     pub fn buy_pack(e: &Env, buyer: Address) {
         buyer.require_auth();
 
+        // Explicit balance pre-check (#14): give a clear, actionable error
+        // instead of the Coin token's opaque internal-balance panic when the
+        // buyer can't afford a pack.
+        let price = Self::price(e);
+        let coin = CoinPay::new(e, &Self::coin(e));
+        if coin.balance(&buyer) < price {
+            panic!("store: not enough coins");
+        }
+
         let to: MuxedAddress = Self::treasury(e).into();
-        CoinPay::new(e, &Self::coin(e)).transfer(&buyer, &to, &Self::price(e));
+        coin.transfer(&buyer, &to, &price);
         PackMint::new(e, &Self::pack(e)).mint(&buyer, &1);
         common::extend_instance(e);
     }

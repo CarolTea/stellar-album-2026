@@ -246,20 +246,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setReveal(undefined);
     setOpening(true);
     await run("Ripping the pack", async (c, addr) => {
-      const sent = await (await c.pack.open({ opener: addr })).signAndSend();
+      // Two-phase commit–reveal (the contract no longer has a single-tx `open`):
+      //  1. commit_open consumes one pack and binds the draw seed to the commit
+      //     ledger — entropy the opener can't preview or re-roll for free.
+      //  2. reveal_open draws + mints, returning the ordered drawn types.
+      // If a previous attempt already committed (e.g. the reveal tx failed), skip
+      // straight to reveal instead of burning a second pack.
+      const pending = await c.pack.has_commit({ opener: addr });
+      if (!pending.result) {
+        await (await c.pack.commit_open({ opener: addr })).signAndSend();
+      }
+      const sent = await (await c.pack.reveal_open({ opener: addr })).signAndSend();
       const resp = sent.getTransactionResponse as unknown as { status?: string };
-      if (resp?.status && resp.status !== "SUCCESS") throw new Error(`pack open reverted on-chain (status=${resp.status})`);
+      if (resp?.status && resp.status !== "SUCCESS") throw new Error(`pack reveal reverted on-chain (status=${resp.status})`);
       // Use the contract's ordered return value — a balance diff can't preserve
       // draw order or per-pack grouping, both of which the reveal needs.
       const result = sent.result as Array<number | bigint> | undefined;
       const types = (Array.isArray(result) ? result : []).map(Number);
-      if (types.length === 0) throw new Error("pack opened but no stickers were returned");
+      if (types.length === 0) throw new Error("pack revealed but no stickers were returned");
       const flat: RevealCard[] = types.map((t) => ({ type: t, isNew: !pasted[t] }));
       const grouped: RevealCard[][] = [];
       for (let i = 0; i < flat.length; i += PACK_SIZE) grouped.push(flat.slice(i, i + PACK_SIZE));
       setReveal({ packs: grouped });
-      // The open already succeeded and the reveal is showing — a transient error
-      // refreshing balances shouldn't surface as an "open failed" toast.
+      // The reveal already succeeded and is showing — a transient error refreshing
+      // balances shouldn't surface as an "open failed" toast.
       try {
         await refresh(c, addr);
       } catch (e) {
