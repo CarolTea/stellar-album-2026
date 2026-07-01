@@ -58,9 +58,9 @@ Public surface:
 
 ### Pack
 A holding of sealed packs. Sealed packs are interchangeable, so an owner holds a **fungible count** of them (`Balance(Address)`), not numbered NFTs — see [decision D16](decisions.md). Opening one collapses that fungibility into unique stickers.
-- `open(owner)` is the centerpiece: it **burns** the pack, draws 3 results with `env.prng()` (repetition within a pack is allowed), and performs a **cross-contract call** to `Sticker.mint` three times.
+- Opening is the centerpiece, split into **commit–reveal** ([decision D24](decisions.md)): `commit_open(owner)` **burns** the pack and records a commitment bound to the commit's ledger; `reveal_open(owner)` draws 3 results (repetition allowed) and performs a **cross-contract call** to `Sticker.mint` three times.
 - The Pack contract must be the **configured minter** of Sticker.
-- **Randomness caveat (taught, not hidden):** `env.prng()` is **grindable** — a user can simulate the open transaction, see the outcome, and only submit when the draw is good (a free re-roll). This is acceptable for a testnet demo and is turned into explicit course content (the attack + mitigations). See [Class 3](curriculum/class-3-pack-album.md) and [decisions](decisions.md).
+- **Randomness (taught, not hidden):** a single-tx draw is *grindable/predictable* — a user can simulate it, see the outcome, and only submit good draws. Commit–reveal binds the seed to `commit_ledger` (entropy the opener can't pick before paying), keeping the draw simulation-stable while removing the free re-roll. `commit_ledger` is weak entropy (validator-biasable); true unpredictability needs a beacon/VRF. See [Class 3](curriculum/class-3-pack-album.md) and [decisions](decisions.md).
 
 ### Album
 A soulbound, per-owner collection — one per person, carrying slot state.

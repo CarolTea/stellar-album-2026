@@ -140,6 +140,11 @@ ADR-style record of the decisions made while designing `stellar-album`, and *why
 ## D28 — Events (observability) deferred to a follow-up (OBS-1)
 **Decision:** structured per-mutation events are specced ([SPEC.md](../SPEC.md) OBS-1) but **not** shipped in PR-UPG; they land in a separate commit/PR.
 **Why:** events are additive observability, not part of "contracts are upgradeable"; keeping them out keeps PR-UPG focused and its diff reviewable. The frontend reveal already reads drawn types from the tx result, so nothing depends on events yet.
+## D29 — Pack opening is commit–reveal (anti-grind)
+**Decision:** replace the single-tx `open` with a two-step **commit–reveal**. `commit_open(opener)` consumes one pack and stores a `Commit { commit_ledger, nonce }` (one outstanding per opener); `reveal_open(opener)` draws `PACK_SIZE` from `sha256(opener ++ commit_ledger ++ nonce)`, mints, and clears the commitment.
+**Why:** the [D22](#d22--pack-draw-is-deterministic-seeded-not-network-random) draw was deterministic per `(opener, nonce)` — fully *predictable* (the opener could foresee every future pack) and the original "grind by simulation" weakness. Binding the seed to `commit_ledger` — the ledger that *happens* to include the commit — adds entropy the opener cannot choose or know before paying, so they can neither preview nor re-roll for free; each attempt already cost a pack at commit.
+**Why it stays simulation-stable:** every seed input is on-chain state fixed at commit time, so `reveal_open`'s draw (and thus its sticker-mint storage footprint) is identical in simulation and execution — the hard Soroban constraint that forced D22's determinism still holds.
+**Trade-off (taught, not hidden):** `commit_ledger` is weak entropy — a party controlling transaction inclusion (e.g. a validator) could bias it. Production-grade unpredictability needs a randomness beacon / VRF; that remains future work. The two-tx UX also changes the reveal choreography (frontend follow-up). See docs/curriculum/class-3-pack-album.md.
 
 ---
 

@@ -31,7 +31,8 @@ fn reproduce_class_3() {
 
     // Mint a pack directly to Alice (the Class-3 demo needs no Store) and open it.
     pack.mint(&alice, &1);
-    let drawn = pack.open(&alice);
+    pack.commit_open(&alice);
+    let drawn = pack.reveal_open(&alice);
     assert_eq!(drawn.len(), 3);
 
     // Open a soulbound album and paste one of the drawn stickers.

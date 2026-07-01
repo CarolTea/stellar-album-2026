@@ -62,8 +62,10 @@ fn reproduce_class_4() {
     assert_eq!(coin.balance(&alice), 900);
     assert_eq!(coin.balance(&bob), 900);
 
-    let alice_pull = pack.open(&alice);
-    let bob_pull = pack.open(&bob);
+    pack.commit_open(&alice);
+    let alice_pull = pack.reveal_open(&alice);
+    pack.commit_open(&bob);
+    let bob_pull = pack.reveal_open(&bob);
     assert_eq!(alice_pull.len(), 3);
     assert_eq!(bob_pull.len(), 3);
     assert_eq!(pack.balance(&alice), 0);
