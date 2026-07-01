@@ -1,4 +1,4 @@
-import { AnimatePresence, MotionConfig } from "framer-motion";
+import { MotionConfig } from "framer-motion";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { useStore } from "./store";
 import Shop from "./pages/Shop";
@@ -72,16 +72,20 @@ export default function App() {
             <Route path="*" element={<Landing connect={connect} busy={busy} error={error} />} />
           </Routes>
         ) : (
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Shop />} />
-              <Route path="/collection" element={<Collection />} />
-              <Route path="/album" element={<Album />} />
-              <Route path="/trade" element={<Trade />} />
-              <Route path="/guide" element={<Guide />} />
-              <Route path="*" element={<Shop />} />
-            </Routes>
-          </AnimatePresence>
+          // Plain Routes (no AnimatePresence exit-tracking): React unmounts the
+          // old page and mounts the new one directly. Each Page still plays its
+          // enter animation; we intentionally drop the route exit animation
+          // because AnimatePresence's exit tracking could wedge on a nested,
+          // mid-flight exit (e.g. the album tray emptying), pinning the old page
+          // in the DOM and leaving the next page's content blank.
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Shop />} />
+            <Route path="/collection" element={<Collection />} />
+            <Route path="/album" element={<Album />} />
+            <Route path="/trade" element={<Trade />} />
+            <Route path="/guide" element={<Guide />} />
+            <Route path="*" element={<Shop />} />
+          </Routes>
         )}
       </div>
     </MotionConfig>
