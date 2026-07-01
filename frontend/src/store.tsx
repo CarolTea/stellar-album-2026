@@ -285,17 +285,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setReveal(undefined);
     setOpening(true);
     await run("Ripping the pack", async (c, addr) => {
-      // Two-phase commit–reveal (the contract no longer has a single-tx `open`):
-      //  1. commit_open consumes one pack and binds the draw seed to the commit
-      //     ledger — entropy the opener can't preview or re-roll for free.
-      //  2. reveal_open draws + mints, returning the ordered drawn types.
-      // If a previous attempt already committed (e.g. the reveal tx failed), skip
-      // straight to reveal instead of burning a second pack.
-      const pending = await c.pack.has_commit({ opener: addr });
-      if (!pending.result) {
-        await (await c.pack.commit_open({ opener: addr })).signAndSend();
-      }
-      const sent = await (await c.pack.reveal_open({ opener: addr })).signAndSend();
+      const sent = await (await c.pack.open({ opener: addr })).signAndSend();
       const resp = sent.getTransactionResponse as unknown as { status?: string };
       if (resp?.status && resp.status !== "SUCCESS") throw new Error(`pack reveal reverted on-chain (status=${resp.status})`);
       // Use the contract's ordered return value — a balance diff can't preserve
